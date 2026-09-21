@@ -1,0 +1,17 @@
+{
+    "name": "Minhas Listas",
+    "short_name": "Minhas Listas",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#800020",
+    "theme_color": "#800020",
+    "description": "Aplicativo para organizar listas e tarefas.",
+
+    "icons": [
+        {
+            "src": "icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

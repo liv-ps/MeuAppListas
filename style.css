@@ -1,0 +1,144 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 25px;
+    background-color: #800020;
+    color: #111111;
+}
+
+/* Cabeçalho */
+header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+h1 {
+    margin: 0;
+    color: white;
+    font-family:"Arial";
+    font-size: 38px;
+    font-weight: 700;
+}
+
+/* Botão + */
+.botaoNovaLista {
+    position: absolute;
+    right: 0;
+
+    width: 45px;
+    height: 45px;
+
+    border: 2px solid white;
+    border-radius: 50%;
+
+    background-color: transparent;
+    color: white;
+
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.botaoNovaLista:hover {
+    background-color: white;
+    color: #800020;
+}
+
+/* Menu das listas */
+#menuListas {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.botaoLista {
+    padding: 10px 18px;
+    border: 2px solid white;
+    border-radius: 20px;
+    background-color: transparent;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.botaoLista:hover {
+    background-color: white;
+    color: #800020;
+}
+
+.botaoLista.ativo {
+    background-color: white;
+    color: #800020;
+    font-weight: bold;
+}
+
+/* Página da lista */
+#listas {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Cartão */
+.lista {
+    background-color: white;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.lista h2 {
+    text-align: center;
+    color: #800020;
+    margin-top: 0;
+}
+
+/* Campo */
+.lista input[type="text"] {
+    width: 65%;
+    padding: 10px;
+    border: 1px solid #111111;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Botões */
+.lista button {
+    padding: 9px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #111111;
+    color: white;
+    cursor: pointer;
+}
+
+.lista button:hover {
+    background-color: #800020;
+}
+
+/* Itens */
+.lista ul {
+    padding-left: 20px;
+}
+
+.lista li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lista li span {
+    flex: 1;
+}
+
+/* Checkbox */
+.lista input[type="checkbox"] {
+    accent-color: #800020;
+}
