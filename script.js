@@ -1,13 +1,17 @@
 let listaAtual = 0;
 
-let itemArrastado = null;
-let listaArrastada = null;
+let listaPressionada = null;
+let itemPressionado = null;
 
-let timerPressionarLista = null;
+let timerLista = null;
+let timerItem = null;
+
+let reorganizandoLista = false;
+let reorganizandoItem = false;
 
 
 /* =========================================
-   CARREGAR LISTAS
+   OBTER LISTAS
 ========================================= */
 
 function obterListas() {
@@ -28,7 +32,10 @@ function obterListas() {
 
     } catch (erro) {
 
-        console.log("Erro ao carregar listas:", erro);
+        console.log(
+            "Erro ao carregar listas:",
+            erro
+        );
     }
 
     return [];
@@ -36,7 +43,7 @@ function obterListas() {
 
 
 /* =========================================
-   SALVAR
+   SALVAR LISTAS
 ========================================= */
 
 function salvarListas(listas) {
@@ -75,9 +82,10 @@ function criarLista() {
 
     });
 
-    salvarListas(listas);
+    listaAtual =
+        listas.length - 1;
 
-    listaAtual = listas.length - 1;
+    salvarListas(listas);
 
     mostrarListas();
 }
@@ -129,16 +137,24 @@ function excluirLista(indice) {
     }
 
     let confirmar = confirm(
-        `Excluir a lista "${listas[indice].nome}"?`
+        'Excluir a lista "' +
+        listas[indice].nome +
+        '"?'
     );
 
     if (!confirmar) {
         return;
     }
 
-    listas.splice(indice, 1);
+    listas.splice(
+        indice,
+        1
+    );
 
-    if (listas.length === 0) {
+
+    if (
+        listas.length === 0
+    ) {
 
         listaAtual = 0;
 
@@ -149,6 +165,7 @@ function excluirLista(indice) {
         listaAtual =
             listas.length - 1;
     }
+
 
     salvarListas(listas);
 
@@ -163,14 +180,22 @@ function excluirLista(indice) {
 function abrirMenuLista(indice) {
 
     let escolha = prompt(
-        "Digite:\n\n1 - Renomear lista\n2 - Excluir lista\n3 - Cancelar"
+        "Digite:\n\n" +
+        "1 - Renomear lista\n" +
+        "2 - Excluir lista\n" +
+        "3 - Cancelar"
     );
 
-    if (escolha === "1") {
+
+    if (
+        escolha === "1"
+    ) {
 
         renomearLista(indice);
 
-    } else if (escolha === "2") {
+    } else if (
+        escolha === "2"
+    ) {
 
         excluirLista(indice);
     }
@@ -183,17 +208,27 @@ function abrirMenuLista(indice) {
 
 function mostrarListas() {
 
-    let listas = obterListas();
+    let listas =
+        obterListas();
 
     let container =
-        document.getElementById("listas");
+        document.getElementById(
+            "listas"
+        );
 
     let menu =
-        document.getElementById("menuListas");
+        document.getElementById(
+            "menuListas"
+        );
 
-    if (!container || !menu) {
+
+    if (
+        !container ||
+        !menu
+    ) {
         return;
     }
+
 
     container.innerHTML = "";
 
@@ -205,18 +240,26 @@ function mostrarListas() {
     ===================================== */
 
     let botaoMais =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
     botaoMais.className =
         "botaoNovaLista";
 
-    botaoMais.textContent = "+";
+    botaoMais.textContent =
+        "+";
 
     botaoMais.title =
         "Nova lista";
 
-    botaoMais.onclick =
-        criarLista;
+    botaoMais.addEventListener(
+        "click",
+        function() {
+
+            criarLista();
+        }
+    );
 
     menu.appendChild(
         botaoMais
@@ -224,7 +267,7 @@ function mostrarListas() {
 
 
     /* =====================================
-       LISTAS
+       BOTÕES DAS LISTAS
     ===================================== */
 
     listas.forEach(
@@ -235,13 +278,13 @@ function mostrarListas() {
                     "button"
                 );
 
+
             botao.className =
                 "botaoLista";
 
             botao.textContent =
                 lista.nome;
 
-            botao.draggable = true;
 
             if (
                 indice === listaAtual
@@ -253,15 +296,42 @@ function mostrarListas() {
             }
 
 
-            /* Abrir lista */
+            /*
+               IMPORTANTE:
+               Não usamos mais dragstart/drop.
+               Agora a reorganização funciona
+               com toque.
+            */
 
-            botao.onclick =
+            botao.dataset.indice =
+                indice;
+
+
+            /* =================================
+               TOQUE NORMAL
+            ================================= */
+
+            botao.addEventListener(
+                "click",
                 function() {
 
-                    listaAtual = indice;
+                    /*
+                       Se estiver reorganizando,
+                       não abre a lista.
+                    */
+
+                    if (
+                        reorganizandoLista
+                    ) {
+                        return;
+                    }
+
+                    listaAtual =
+                        indice;
 
                     mostrarListas();
-                };
+                }
+            );
 
 
             /* =================================
@@ -270,131 +340,81 @@ function mostrarListas() {
 
             botao.addEventListener(
                 "pointerdown",
-                function() {
+                function(event) {
 
-                    timerPressionarLista =
+                    /*
+                       Apenas toque com dedo
+                       ou caneta.
+                    */
+
+                    if (
+                        event.pointerType ===
+                        "mouse"
+                    ) {
+                        return;
+                    }
+
+
+                    listaPressionada =
+                        indice;
+
+
+                    timerLista =
                         setTimeout(
                             function() {
 
-                                abrirMenuLista(
+                                iniciarReorganizacaoLista(
+                                    botao,
                                     indice
                                 );
 
                             },
-                            600
+                            500
                         );
                 }
             );
 
 
+            /* =================================
+               SOLTAR
+            ================================= */
+
             botao.addEventListener(
                 "pointerup",
-                function() {
+                function(event) {
 
                     clearTimeout(
-                        timerPressionarLista
+                        timerLista
                     );
+
+
+                    if (
+                        reorganizandoLista
+                    ) {
+
+                        finalizarReorganizacaoLista(
+                            botao
+                        );
+                    }
                 }
             );
 
 
-            botao.addEventListener(
-                "pointerleave",
-                function() {
-
-                    clearTimeout(
-                        timerPressionarLista
-                    );
-                }
-            );
-
+            /* =================================
+               CANCELAR TOQUE
+            ================================= */
 
             botao.addEventListener(
                 "pointercancel",
                 function() {
 
                     clearTimeout(
-                        timerPressionarLista
-                    );
-                }
-            );
-
-
-            /* =================================
-               ARRASTAR LISTA
-            ================================= */
-
-            botao.addEventListener(
-                "dragstart",
-                function() {
-
-                    listaArrastada =
-                        indice;
-
-                    botao.classList.add(
-                        "lista-arrastando"
-                    );
-                }
-            );
-
-
-            botao.addEventListener(
-                "dragend",
-                function() {
-
-                    botao.classList.remove(
-                        "lista-arrastando"
+                        timerLista
                     );
 
-                    listaArrastada =
-                        null;
-                }
-            );
-
-
-            botao.addEventListener(
-                "dragover",
-                function(event) {
-
-                    event.preventDefault();
-                }
-            );
-
-
-            botao.addEventListener(
-                "drop",
-                function(event) {
-
-                    event.preventDefault();
-
-                    if (
-                        listaArrastada === null ||
-                        listaArrastada === indice
-                    ) {
-                        return;
-                    }
-
-                    let listasAtualizadas =
-                        obterListas();
-
-                    let movida =
-                        listasAtualizadas.splice(
-                            listaArrastada,
-                            1
-                        )[0];
-
-                    listasAtualizadas.splice(
-                        indice,
-                        0,
-                        movida
+                    finalizarReorganizacaoLista(
+                        botao
                     );
-
-
-                    salvarListas(
-                        listasAtualizadas
-                    );
-
-                    mostrarListas();
                 }
             );
 
@@ -407,15 +427,20 @@ function mostrarListas() {
 
 
     /* =====================================
-       SEM LISTAS
+       SE NÃO EXISTE LISTA
     ===================================== */
 
     if (
         listas.length === 0
     ) {
+
         return;
     }
 
+
+    /* =====================================
+       CORRIGIR ÍNDICE
+    ===================================== */
 
     if (
         listaAtual >= listas.length
@@ -423,6 +448,14 @@ function mostrarListas() {
 
         listaAtual =
             listas.length - 1;
+    }
+
+
+    if (
+        listaAtual < 0
+    ) {
+
+        listaAtual = 0;
     }
 
 
@@ -435,7 +468,10 @@ function mostrarListas() {
 
 
     let div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.className =
         "lista";
@@ -443,7 +479,10 @@ function mostrarListas() {
 
     div.innerHTML = `
 
-        <h2>${escaparHTML(lista.nome)}</h2>
+        <h2>
+            ${escaparHTML(lista.nome)}
+        </h2>
+
 
         <div class="caixaAdicionar">
 
@@ -456,21 +495,25 @@ function mostrarListas() {
 
             <button
                 id="botaoEnviar"
-                title="Adicionar item"
+                type="button"
             >
                 ➤
             </button>
 
         </div>
 
+
         <ul id="itensLista"></ul>
+
 
         <div id="concluidas"></div>
 
     `;
 
 
-    container.appendChild(div);
+    container.appendChild(
+        div
+    );
 
 
     let ul =
@@ -480,7 +523,7 @@ function mostrarListas() {
 
 
     /* =====================================
-       TAREFAS PENDENTES
+       MOSTRAR ITENS
     ===================================== */
 
     lista.itens.forEach(
@@ -492,6 +535,7 @@ function mostrarListas() {
                 return;
             }
 
+
             criarItem(
                 item,
                 indice,
@@ -502,7 +546,7 @@ function mostrarListas() {
 
 
     /* =====================================
-       CONCLUÍDAS
+       TAREFAS CONCLUÍDAS
     ===================================== */
 
     let concluidas =
@@ -525,13 +569,14 @@ function mostrarListas() {
 
 
     /* =====================================
-       ADICIONAR
+       CAMPO DE ADICIONAR
     ===================================== */
 
     let campo =
         document.getElementById(
             "campoItem"
         );
+
 
     let botaoEnviar =
         document.getElementById(
@@ -566,6 +611,218 @@ function mostrarListas() {
 
 
 /* =========================================
+   REORGANIZAR LISTA NO CELULAR
+========================================= */
+
+function iniciarReorganizacaoLista(
+    botao,
+    indice
+) {
+
+    reorganizandoLista = true;
+
+    listaPressionada =
+        indice;
+
+
+    botao.classList.add(
+        "lista-arrastando"
+    );
+
+
+    /*
+       Vibração curta no celular,
+       quando suportada.
+    */
+
+    if (
+        navigator.vibrate
+    ) {
+
+        navigator.vibrate(50);
+    }
+
+
+    /*
+       Permite acompanhar o dedo.
+    */
+
+    document.addEventListener(
+        "pointermove",
+        moverLista
+    );
+}
+
+
+/* =========================================
+   MOVER LISTA
+========================================= */
+
+function moverLista(event) {
+
+    if (
+        !reorganizandoLista
+    ) {
+        return;
+    }
+
+
+    /*
+       Descobre qual botão está
+       debaixo do dedo.
+    */
+
+    let elemento =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+
+    if (!elemento) {
+        return;
+    }
+
+
+    let botao =
+        elemento.closest(
+            ".botaoLista"
+        );
+
+
+    if (
+        !botao
+    ) {
+        return;
+    }
+
+
+    let destino =
+        Number(
+            botao.dataset.indice
+        );
+
+
+    if (
+        destino ===
+        listaPressionada
+    ) {
+        return;
+    }
+
+
+    let listas =
+        obterListas();
+
+
+    let movida =
+        listas.splice(
+            listaPressionada,
+            1
+        )[0];
+
+
+    listas.splice(
+        destino,
+        0,
+        movida
+    );
+
+
+    /*
+       Mantém a lista que estava aberta.
+    */
+
+    if (
+        listaAtual ===
+        listaPressionada
+    ) {
+
+        listaAtual =
+            destino;
+
+    } else if (
+        listaPressionada <
+            listaAtual &&
+        destino >=
+            listaAtual
+    ) {
+
+        listaAtual--;
+
+    } else if (
+        listaPressionada >
+            listaAtual &&
+        destino <=
+            listaAtual
+    ) {
+
+        listaAtual++;
+    }
+
+
+    salvarListas(
+        listas
+    );
+
+
+    listaPressionada =
+        destino;
+
+
+    mostrarListas();
+}
+
+
+/* =========================================
+   FINALIZAR REORGANIZAÇÃO DA LISTA
+========================================= */
+
+function finalizarReorganizacaoLista(
+    botao
+) {
+
+    clearTimeout(
+        timerLista
+    );
+
+
+    if (
+        !reorganizandoLista
+    ) {
+        return;
+    }
+
+
+    reorganizandoLista =
+        false;
+
+
+    document.removeEventListener(
+        "pointermove",
+        moverLista
+    );
+
+
+    if (
+        botao
+    ) {
+
+        botao.classList.remove(
+            "lista-arrastando"
+        );
+    }
+
+
+    listaPressionada =
+        null;
+
+
+    mostrarListas();
+}
+
+
+/* =========================================
    CRIAR ITEM
 ========================================= */
 
@@ -576,12 +833,17 @@ function criarItem(
 ) {
 
     let li =
-        document.createElement("li");
+        document.createElement(
+            "li"
+        );
 
-    li.draggable = true;
 
     li.className =
         "itemTarefa";
+
+
+    li.dataset.indice =
+        indice;
 
 
     li.innerHTML = `
@@ -591,9 +853,11 @@ function criarItem(
         >
 
         <span
-            contenteditable="true"
             class="textoItem"
-        >${escaparHTML(item.texto)}</span>
+            contenteditable="true"
+        >
+            ${escaparHTML(item.texto)}
+        </span>
 
     `;
 
@@ -611,7 +875,7 @@ function criarItem(
 
 
     /* =====================================
-       CONCLUIR
+       CONCLUIR ITEM
     ===================================== */
 
     checkbox.addEventListener(
@@ -621,6 +885,7 @@ function criarItem(
             let listas =
                 obterListas();
 
+
             listas[
                 listaAtual
             ].itens[
@@ -628,9 +893,11 @@ function criarItem(
             ].concluido =
                 checkbox.checked;
 
+
             salvarListas(
                 listas
             );
+
 
             mostrarListas();
         }
@@ -638,7 +905,7 @@ function criarItem(
 
 
     /* =====================================
-       EDITAR
+       EDITAR ITEM
     ===================================== */
 
     texto.addEventListener(
@@ -647,6 +914,7 @@ function criarItem(
 
             let novoTexto =
                 texto.textContent.trim();
+
 
             let listas =
                 obterListas();
@@ -678,10 +946,15 @@ function criarItem(
                 listas
             );
 
+
             mostrarListas();
         }
     );
 
+
+    /* =====================================
+       ENTER AO EDITAR
+    ===================================== */
 
     texto.addEventListener(
         "keydown",
@@ -700,92 +973,278 @@ function criarItem(
 
 
     /* =====================================
-       ARRASTAR ITEM
+       PRESSIONAR ITEM
     ===================================== */
 
     li.addEventListener(
-        "dragstart",
-        function() {
-
-            itemArrastado =
-                indice;
-
-            li.classList.add(
-                "item-arrastando"
-            );
-        }
-    );
-
-
-    li.addEventListener(
-        "dragend",
-        function() {
-
-            li.classList.remove(
-                "item-arrastando"
-            );
-
-            itemArrastado =
-                null;
-        }
-    );
-
-
-    li.addEventListener(
-        "dragover",
+        "pointerdown",
         function(event) {
 
-            event.preventDefault();
-        }
-    );
-
-
-    li.addEventListener(
-        "drop",
-        function(event) {
-
-            event.preventDefault();
+            /*
+               Não inicia reorganização
+               quando tocar diretamente
+               no texto para editar.
+            */
 
             if (
-                itemArrastado === null ||
-                itemArrastado === indice
+                event.target === texto ||
+                event.target === checkbox
+            ) {
+
+                return;
+            }
+
+
+            if (
+                event.pointerType ===
+                "mouse"
             ) {
                 return;
             }
 
-            let listas =
-                obterListas();
 
-            let itens =
-                listas[
-                    listaAtual
-                ].itens;
+            itemPressionado =
+                indice;
 
 
-            let movido =
-                itens.splice(
-                    itemArrastado,
-                    1
-                )[0];
+            timerItem =
+                setTimeout(
+                    function() {
 
+                        iniciarReorganizacaoItem(
+                            li,
+                            indice
+                        );
 
-            itens.splice(
-                indice,
-                0,
-                movido
-            );
-
-
-            salvarListas(
-                listas
-            );
-
-            mostrarListas();
+                    },
+                    500
+                );
         }
     );
 
 
-    ul.appendChild(li);
+    /* =====================================
+       SOLTAR ITEM
+    ===================================== */
+
+    li.addEventListener(
+        "pointerup",
+        function() {
+
+            clearTimeout(
+                timerItem
+            );
+
+
+            if (
+                reorganizandoItem
+            ) {
+
+                finalizarReorganizacaoItem(
+                    li
+                );
+            }
+        }
+    );
+
+
+    /* =====================================
+       CANCELAR
+    ===================================== */
+
+    li.addEventListener(
+        "pointercancel",
+        function() {
+
+            clearTimeout(
+                timerItem
+            );
+
+
+            finalizarReorganizacaoItem(
+                li
+            );
+        }
+    );
+
+
+    ul.appendChild(
+        li
+    );
+}
+
+
+/* =========================================
+   INICIAR REORGANIZAÇÃO DO ITEM
+========================================= */
+
+function iniciarReorganizacaoItem(
+    li,
+    indice
+) {
+
+    reorganizandoItem =
+        true;
+
+
+    itemPressionado =
+        indice;
+
+
+    li.classList.add(
+        "item-arrastando"
+    );
+
+
+    if (
+        navigator.vibrate
+    ) {
+
+        navigator.vibrate(50);
+    }
+
+
+    document.addEventListener(
+        "pointermove",
+        moverItem
+    );
+}
+
+
+/* =========================================
+   MOVER ITEM
+========================================= */
+
+function moverItem(event) {
+
+    if (
+        !reorganizandoItem
+    ) {
+        return;
+    }
+
+
+    let elemento =
+        document.elementFromPoint(
+            event.clientX,
+            event.clientY
+        );
+
+
+    if (!elemento) {
+        return;
+    }
+
+
+    let li =
+        elemento.closest(
+            ".itemTarefa"
+        );
+
+
+    if (
+        !li
+    ) {
+        return;
+    }
+
+
+    let destino =
+        Number(
+            li.dataset.indice
+        );
+
+
+    if (
+        destino ===
+        itemPressionado
+    ) {
+        return;
+    }
+
+
+    let listas =
+        obterListas();
+
+
+    let itens =
+        listas[
+            listaAtual
+        ].itens;
+
+
+    let movido =
+        itens.splice(
+            itemPressionado,
+            1
+        )[0];
+
+
+    itens.splice(
+        destino,
+        0,
+        movido
+    );
+
+
+    salvarListas(
+        listas
+    );
+
+
+    itemPressionado =
+        destino;
+
+
+    mostrarListas();
+}
+
+
+/* =========================================
+   FINALIZAR REORGANIZAÇÃO DO ITEM
+========================================= */
+
+function finalizarReorganizacaoItem(
+    li
+) {
+
+    clearTimeout(
+        timerItem
+    );
+
+
+    if (
+        !reorganizandoItem
+    ) {
+        return;
+    }
+
+
+    reorganizandoItem =
+        false;
+
+
+    document.removeEventListener(
+        "pointermove",
+        moverItem
+    );
+
+
+    if (
+        li
+    ) {
+
+        li.classList.remove(
+            "item-arrastando"
+        );
+    }
+
+
+    itemPressionado =
+        null;
+
+
+    mostrarListas();
 }
 
 
@@ -808,7 +1267,9 @@ function criarAreaConcluidas(
             "details"
         );
 
+
     detalhes.open = false;
+
 
     detalhes.className =
         "tarefasConcluidas";
@@ -893,6 +1354,7 @@ function criarAreaConcluidas(
                     let listas =
                         obterListas();
 
+
                     listas[
                         listaAtual
                     ].itens[
@@ -900,16 +1362,20 @@ function criarAreaConcluidas(
                     ].concluido =
                         false;
 
+
                     salvarListas(
                         listas
                     );
+
 
                     mostrarListas();
                 }
             );
 
 
-            ul.appendChild(li);
+            ul.appendChild(
+                li
+            );
         }
     );
 
@@ -944,6 +1410,13 @@ function adicionarItem() {
         obterListas();
 
 
+    if (
+        !listas[listaAtual]
+    ) {
+        return;
+    }
+
+
     listas[
         listaAtual
     ].itens.push({
@@ -953,6 +1426,7 @@ function adicionarItem() {
 
         concluido:
             false
+
     });
 
 
@@ -976,21 +1450,24 @@ function escaparHTML(texto) {
             "div"
         );
 
+
     div.textContent =
         texto;
+
 
     return div.innerHTML;
 }
 
 
 /* =========================================
-   INICIAR
+   INICIAR APP
 ========================================= */
 
 function carregarListas() {
 
     let listas =
         obterListas();
+
 
     if (
         listas.length === 0
@@ -1027,7 +1504,24 @@ if (
         function() {
 
             navigator.serviceWorker
-                .register("./sw.js");
+                .register("./sw.js")
+                .then(
+                    function() {
+
+                        console.log(
+                            "Service Worker ativo."
+                        );
+                    }
+                )
+                .catch(
+                    function(erro) {
+
+                        console.log(
+                            "Erro no Service Worker:",
+                            erro
+                        );
+                    }
+                );
         }
     );
 }
