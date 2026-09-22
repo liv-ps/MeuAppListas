@@ -9,7 +9,6 @@
 html {
     width: 100%;
     height: 100%;
-
     touch-action: manipulation;
 }
 
@@ -20,7 +19,6 @@ body {
     min-height: 100dvh;
 
     margin: 0;
-
     padding: 20px;
 
     background-color: #800020;
@@ -51,7 +49,7 @@ h1 {
 
     font-family: "Josefin Sans", sans-serif;
 
-    font-size: 25px;
+    font-size: 23px;
 
     font-weight: 300;
 
@@ -121,6 +119,10 @@ h1 {
     -webkit-tap-highlight-color: transparent;
 }
 
+.botaoNovaLista:active {
+    transform: scale(0.94);
+}
+
 
 /* =========================================
    BOTÕES DAS LISTAS
@@ -149,9 +151,17 @@ h1 {
 
     -webkit-user-select: none;
 
-    touch-action: manipulation;
+    /*
+       Permite que o JavaScript
+       controle o gesto de arrastar.
+    */
+    touch-action: none;
 
     -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 0.15s,
+        opacity 0.15s;
 }
 
 .botaoLista.ativo {
@@ -162,8 +172,20 @@ h1 {
     font-weight: bold;
 }
 
+.botaoLista:active {
+    transform: scale(0.97);
+}
+
+
+/*
+   Aparência enquanto a lista
+   está sendo reorganizada.
+*/
+
 .botaoLista.lista-arrastando {
-    opacity: 0.4;
+    opacity: 0.45;
+
+    transform: scale(0.95);
 }
 
 
@@ -181,7 +203,7 @@ h1 {
 
 
 /* =========================================
-   CARTÃO
+   CARTÃO DA LISTA
 ========================================= */
 
 .lista {
@@ -199,6 +221,11 @@ h1 {
         0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+
+/* =========================================
+   NOME DA LISTA
+========================================= */
+
 .lista h2 {
     text-align: center;
 
@@ -207,11 +234,17 @@ h1 {
     margin-top: 0;
 
     margin-bottom: 18px;
+
+    font-size: 23px;
+
+    font-weight: 500;
+
+    overflow-wrap: anywhere;
 }
 
 
 /* =========================================
-   CAMPO DE ADICIONAR
+   CAMPO DE ADICIONAR ITEM
 ========================================= */
 
 .caixaAdicionar {
@@ -225,6 +258,11 @@ h1 {
 
     margin-bottom: 20px;
 }
+
+
+/* =========================================
+   CAMPO DE TEXTO
+========================================= */
 
 .caixaAdicionar input {
     flex: 1;
@@ -247,6 +285,10 @@ h1 {
 
     font-family: Arial, sans-serif;
 
+    background-color: white;
+
+    color: #111111;
+
     -webkit-appearance: none;
 
     appearance: none;
@@ -257,6 +299,11 @@ h1 {
 
     outline: none;
 }
+
+
+/* =========================================
+   BOTÃO DE ENVIAR
+========================================= */
 
 .caixaAdicionar button {
     width: 45px;
@@ -286,11 +333,23 @@ h1 {
     justify-content: center;
 
     flex-shrink: 0;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 0.15s,
+        background-color 0.15s;
+}
+
+.caixaAdicionar button:active {
+    transform: scale(0.92);
+
+    background-color: #5f0018;
 }
 
 
 /* =========================================
-   ITENS
+   LISTA DE ITENS
 ========================================= */
 
 .lista ul {
@@ -301,18 +360,33 @@ h1 {
     list-style: none;
 }
 
-.lista li {
-    margin-bottom: 10px;
+
+/* =========================================
+   ITEM DA TAREFA
+========================================= */
+
+.lista li.itemTarefa {
+    width: 100%;
+
+    margin-bottom: 8px;
+
+    padding: 10px;
 
     display: flex;
 
     align-items: center;
 
-    gap: 8px;
-
-    padding: 10px;
+    gap: 9px;
 
     border-radius: 8px;
+
+    background-color: transparent;
+
+    /*
+       Fundamental para o arrastar
+       funcionar com o dedo.
+    */
+    touch-action: none;
 
     user-select: none;
 
@@ -320,15 +394,18 @@ h1 {
 
     cursor: grab;
 
-    touch-action: none;
+    transition:
+        background-color 0.15s,
+        opacity 0.15s,
+        transform 0.15s;
 }
 
-.lista li:active {
+.lista li.itemTarefa:active {
     cursor: grabbing;
 }
 
-.lista li:hover {
-    background-color: #f3f3f3;
+.lista li.itemTarefa:hover {
+    background-color: #f4f4f4;
 }
 
 
@@ -336,21 +413,28 @@ h1 {
    CHECKBOX
 ========================================= */
 
-.lista input[type="checkbox"] {
+.lista li.itemTarefa input[type="checkbox"] {
     width: 18px;
 
     height: 18px;
 
-    accent-color: #800020;
+    margin: 0;
 
     flex-shrink: 0;
 
+    accent-color: #800020;
+
     cursor: pointer;
+
+    /*
+       O checkbox continua clicável.
+    */
+    touch-action: manipulation;
 }
 
 
 /* =========================================
-   TEXTO
+   TEXTO DA TAREFA
 ========================================= */
 
 .textoItem {
@@ -369,23 +453,36 @@ h1 {
     -webkit-user-select: text;
 
     touch-action: manipulation;
+
+    line-height: 1.4;
+
+    font-size: 16px;
 }
+
+
+/*
+   Quando estiver editando
+*/
 
 .textoItem:focus {
     background-color: #f5f5f5;
 
     border-radius: 4px;
 
-    padding: 2px 4px;
+    padding: 3px 5px;
 }
 
 
 /* =========================================
-   ARRASTAR ITEM
+   ITEM SENDO ARRASTADO
 ========================================= */
 
 .item-arrastando {
     opacity: 0.4;
+
+    background-color: #eeeeee !important;
+
+    transform: scale(0.98);
 }
 
 
@@ -401,6 +498,11 @@ h1 {
     border-top: 1px solid #dddddd;
 }
 
+
+/* =========================================
+   CABEÇALHO DAS CONCLUÍDAS
+========================================= */
+
 .tarefasConcluidas summary {
     color: #800020;
 
@@ -415,11 +517,23 @@ h1 {
     padding: 8px 0;
 
     user-select: none;
+
+    -webkit-user-select: none;
 }
+
+
+/*
+   Remove seta padrão
+*/
 
 .tarefasConcluidas summary::-webkit-details-marker {
     display: none;
 }
+
+
+/*
+   Nossa seta
+*/
 
 .tarefasConcluidas summary::before {
     content: "›";
@@ -430,23 +544,59 @@ h1 {
 
     font-size: 20px;
 
-    transition: transform 0.2s;
+    line-height: 10px;
+
+    transition:
+        transform 0.2s;
 }
+
+
+/*
+   Quando abrir
+*/
 
 .tarefasConcluidas[open]
 summary::before {
+
     transform: rotate(90deg);
 }
 
+
+/* =========================================
+   ITENS CONCLUÍDOS
+========================================= */
+
 .tarefasConcluidas li {
-    cursor: default;
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px;
 
     opacity: 0.65;
+
+    cursor: default;
 
     touch-action: auto;
 }
 
+.tarefasConcluidas li input {
+    width: 18px;
+
+    height: 18px;
+
+    accent-color: #800020;
+
+    flex-shrink: 0;
+}
+
 .tarefasConcluidas li span {
+    flex: 1;
+
+    overflow-wrap: anywhere;
+
     text-decoration: line-through;
 }
 
@@ -466,13 +616,37 @@ summary::before {
         overflow-x: hidden;
     }
 
+
     body {
         padding: 15px;
     }
 
+
     h1 {
-        font-size: 23px;
+        font-size: 22px;
     }
+
+
+    #menuListas {
+        margin-bottom: 15px;
+    }
+
+
+    .botaoNovaLista {
+        width: 38px;
+
+        height: 38px;
+
+        font-size: 24px;
+    }
+
+
+    .botaoLista {
+        padding: 8px 15px;
+
+        font-size: 14px;
+    }
+
 
     .lista {
         min-height: 450px;
@@ -482,21 +656,72 @@ summary::before {
         border-radius: 18px;
     }
 
+
     .lista h2 {
-        font-size: 22px;
+        font-size: 21px;
+
+        margin-bottom: 16px;
     }
+
 
     .caixaAdicionar {
         margin-bottom: 18px;
     }
 
+
     .caixaAdicionar input {
+        height: 45px;
+
         font-size: 16px;
     }
 
-    .botaoLista {
-        font-size: 14px;
 
-        padding: 8px 15px;
+    .caixaAdicionar button {
+        width: 45px;
+
+        height: 45px;
+
+        min-width: 45px;
+    }
+
+
+    .lista li.itemTarefa {
+        padding: 11px 8px;
+
+        margin-bottom: 6px;
+    }
+
+
+    .textoItem {
+        font-size: 16px;
+    }
+
+
+    .tarefasConcluidas summary {
+        font-size: 14px;
+    }
+}
+
+
+/* =========================================
+   IPHONE
+========================================= */
+
+@supports (-webkit-touch-callout: none) {
+
+    .caixaAdicionar input {
+        /*
+           Evita que o Safari aumente
+           o zoom ao tocar no campo.
+        */
+        font-size: 16px;
+    }
+
+    body {
+        /*
+           Evita pequenas mudanças
+           horizontais causadas pelo Safari.
+        */
+        overflow-x: hidden;
     }
 }
