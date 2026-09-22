@@ -1,71 +1,98 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 25px;
+    padding: 20px;
     background-color: #800020;
     color: #111111;
 }
 
-/* Cabeçalho */
+
+/* TÍTULO */
+
 header {
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
 h1 {
     margin: 0;
     color: white;
-    font-family:"Arial";
-    font-size: 38px;
-    font-weight: 700;
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 1px;
 }
 
-/* Botão + */
-.botaoNovaLista {
-    position: absolute;
-    right: 0;
 
-    width: 45px;
-    height: 45px;
+/* MENU DAS LISTAS */
+
+#menuListas {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 5px 0;
+
+    flex-wrap: nowrap;
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+#menuListas::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* BOTÃO + */
+
+.botaoNovaLista {
+    flex: 0 0 auto;
+
+    width: 40px;
+    height: 40px;
 
     border: 2px solid white;
     border-radius: 50%;
 
-    background-color: transparent;
-    color: white;
+    background-color: white;
+    color: #800020;
 
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 300;
-    line-height: 1;
 
     cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .botaoNovaLista:hover {
-    background-color: white;
-    color: #800020;
+    background-color: #111111;
+    color: white;
 }
 
-/* Menu das listas */
-#menuListas {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 25px;
-}
+
+/* BOTÕES DAS LISTAS */
 
 .botaoLista {
-    padding: 10px 18px;
+    flex: 0 0 auto;
+
+    padding: 9px 17px;
+
     border: 2px solid white;
     border-radius: 20px;
+
     background-color: transparent;
     color: white;
+
     font-size: 15px;
+
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .botaoLista:hover {
@@ -79,18 +106,31 @@ h1 {
     font-weight: bold;
 }
 
-/* Página da lista */
+
+/* ÁREA DA LISTA */
+
 #listas {
     max-width: 600px;
     margin: 0 auto;
 }
 
-/* Cartão */
+
+/* CARTÃO */
+
 .lista {
     background-color: white;
+
     padding: 25px;
+    padding-bottom: 85px;
+
     border-radius: 18px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3);
+
+    min-height: 450px;
+
+    position: relative;
 }
 
 .lista h2 {
@@ -99,46 +139,168 @@ h1 {
     margin-top: 0;
 }
 
-/* Campo */
-.lista input[type="text"] {
-    width: 65%;
-    padding: 10px;
-    border: 1px solid #111111;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
 
-/* Botões */
-.lista button {
-    padding: 9px 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #111111;
-    color: white;
-    cursor: pointer;
-}
+/* ITENS */
 
-.lista button:hover {
-    background-color: #800020;
-}
-
-/* Itens */
 .lista ul {
-    padding-left: 20px;
+    padding-left: 0;
+    list-style: none;
 }
 
 .lista li {
     margin-bottom: 12px;
+
     display: flex;
     align-items: center;
+
     gap: 8px;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    cursor: grab;
+}
+
+.lista li:hover {
+    background-color: #f3f3f3;
+}
+
+.lista li:active {
+    cursor: grabbing;
 }
 
 .lista li span {
     flex: 1;
 }
 
-/* Checkbox */
+
+/* BOTÃO EXCLUIR */
+
+.lista li button {
+    padding: 6px 9px;
+
+    border: none;
+    border-radius: 5px;
+
+    background-color: #111111;
+    color: white;
+
+    cursor: pointer;
+}
+
+.lista li button:hover {
+    background-color: #800020;
+}
+
+
+/* CHECKBOX */
+
 .lista input[type="checkbox"] {
     accent-color: #800020;
+}
+
+
+/* =========================================
+   BARRA DE ADICIONAR ITEM
+========================================= */
+
+.caixaAdicionar {
+    position: absolute;
+
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+
+    display: flex;
+    gap: 8px;
+
+    background-color: white;
+}
+
+
+/* CAMPO */
+
+.caixaAdicionar input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    border: 1px solid #999999;
+
+    border-radius: 25px;
+
+    outline: none;
+
+    font-size: 15px;
+
+    box-sizing: border-box;
+}
+
+.caixaAdicionar input:focus {
+    border-color: #800020;
+}
+
+
+/* BOTÃO ENVIAR */
+
+.caixaAdicionar button {
+    width: 45px;
+    height: 45px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background-color: #800020;
+
+    color: white;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+}
+
+.caixaAdicionar button:hover {
+    background-color: #111111;
+}
+
+
+/* ELEMENTOS ARRASTADOS */
+
+.item-arrastando {
+    opacity: 0.4;
+}
+
+.lista-arrastando {
+    opacity: 0.5;
+}
+
+
+/* CELULAR */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    .lista {
+        padding: 20px;
+        padding-bottom: 85px;
+        min-height: 450px;
+    }
+
+    .caixaAdicionar {
+        left: 15px;
+        right: 15px;
+    }
 }
