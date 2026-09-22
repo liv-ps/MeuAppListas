@@ -3,6 +3,8 @@ let listaAtual = 0;
 let itemArrastado = null;
 let listaArrastada = null;
 
+let timerPressionarLista = null;
+
 
 /* =========================================
    CARREGAR LISTAS
@@ -26,95 +28,7 @@ function obterListas() {
 
     } catch (erro) {
 
-        console.log(
-            "Formato antigo detectado."
-        );
-
-        /*
-           Tenta recuperar o formato antigo
-           que estava salvo como HTML.
-        */
-
-        try {
-
-            let area =
-                document.createElement("div");
-
-            area.innerHTML = dados;
-
-            let listas = [];
-
-            area.querySelectorAll(
-                ":scope > div"
-            ).forEach(function(div) {
-
-                let titulo =
-                    div.querySelector("h2");
-
-                if (!titulo) {
-                    return;
-                }
-
-                let novaLista = {
-
-                    nome:
-                        titulo.textContent.trim(),
-
-                    itens: []
-
-                };
-
-                let itens =
-                    div.querySelectorAll(
-                        "ul > li"
-                    );
-
-                itens.forEach(function(li) {
-
-                    let span =
-                        li.querySelector("span");
-
-                    let checkbox =
-                        li.querySelector(
-                            "input[type='checkbox']"
-                        );
-
-                    if (!span) {
-                        return;
-                    }
-
-                    novaLista.itens.push({
-
-                        texto:
-                            span.textContent.trim(),
-
-                        concluido:
-                            checkbox
-                                ? checkbox.checked
-                                : false
-
-                    });
-
-                });
-
-                listas.push(novaLista);
-
-            });
-
-
-            if (listas.length > 0) {
-
-                salvarListas(listas);
-
-                return listas;
-            }
-
-        } catch (erroAntigo) {
-
-            console.log(
-                "Não foi possível recuperar os dados antigos."
-            );
-        }
+        console.log("Erro ao carregar listas:", erro);
     }
 
     return [];
@@ -122,7 +36,7 @@ function obterListas() {
 
 
 /* =========================================
-   SALVAR LISTAS
+   SALVAR
 ========================================= */
 
 function salvarListas(listas) {
@@ -135,13 +49,14 @@ function salvarListas(listas) {
 
 
 /* =========================================
-   CRIAR NOVA LISTA
+   CRIAR LISTA
 ========================================= */
 
 function criarLista() {
 
-    let nome =
-        prompt("Digite o nome da lista:");
+    let nome = prompt(
+        "Digite o nome da lista:"
+    );
 
     if (
         !nome ||
@@ -150,13 +65,11 @@ function criarLista() {
         return;
     }
 
-    let listas =
-        obterListas();
+    let listas = obterListas();
 
     listas.push({
 
-        nome:
-            nome.trim(),
+        nome: nome.trim(),
 
         itens: []
 
@@ -164,10 +77,103 @@ function criarLista() {
 
     salvarListas(listas);
 
-    listaAtual =
-        listas.length - 1;
+    listaAtual = listas.length - 1;
 
     mostrarListas();
+}
+
+
+/* =========================================
+   RENOMEAR LISTA
+========================================= */
+
+function renomearLista(indice) {
+
+    let listas = obterListas();
+
+    if (!listas[indice]) {
+        return;
+    }
+
+    let novoNome = prompt(
+        "Digite o novo nome da lista:",
+        listas[indice].nome
+    );
+
+    if (
+        novoNome === null ||
+        novoNome.trim() === ""
+    ) {
+        return;
+    }
+
+    listas[indice].nome =
+        novoNome.trim();
+
+    salvarListas(listas);
+
+    mostrarListas();
+}
+
+
+/* =========================================
+   EXCLUIR LISTA
+========================================= */
+
+function excluirLista(indice) {
+
+    let listas = obterListas();
+
+    if (!listas[indice]) {
+        return;
+    }
+
+    let confirmar = confirm(
+        `Excluir a lista "${listas[indice].nome}"?`
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    listas.splice(indice, 1);
+
+    if (listas.length === 0) {
+
+        listaAtual = 0;
+
+    } else if (
+        listaAtual >= listas.length
+    ) {
+
+        listaAtual =
+            listas.length - 1;
+    }
+
+    salvarListas(listas);
+
+    mostrarListas();
+}
+
+
+/* =========================================
+   MENU DA LISTA
+========================================= */
+
+function abrirMenuLista(indice) {
+
+    let escolha = prompt(
+        "Digite:\n\n1 - Renomear lista\n2 - Excluir lista\n3 - Cancelar"
+    );
+
+    if (escolha === "1") {
+
+        renomearLista(indice);
+
+    } else if (escolha === "2") {
+
+        excluirLista(indice);
+    }
 }
 
 
@@ -177,8 +183,7 @@ function criarLista() {
 
 function mostrarListas() {
 
-    let listas =
-        obterListas();
+    let listas = obterListas();
 
     let container =
         document.getElementById("listas");
@@ -205,8 +210,7 @@ function mostrarListas() {
     botaoMais.className =
         "botaoNovaLista";
 
-    botaoMais.textContent =
-        "+";
+    botaoMais.textContent = "+";
 
     botaoMais.title =
         "Nova lista";
@@ -220,7 +224,7 @@ function mostrarListas() {
 
 
     /* =====================================
-       BOTÕES DAS LISTAS
+       LISTAS
     ===================================== */
 
     listas.forEach(
@@ -237,6 +241,8 @@ function mostrarListas() {
             botao.textContent =
                 lista.nome;
 
+            botao.draggable = true;
+
             if (
                 indice === listaAtual
             ) {
@@ -246,27 +252,77 @@ function mostrarListas() {
                 );
             }
 
-            /*
-               Permite reorganizar
-               as listas.
-            */
 
-            botao.draggable = true;
-
-
-            /* ABRIR LISTA */
+            /* Abrir lista */
 
             botao.onclick =
                 function() {
 
-                    listaAtual =
-                        indice;
+                    listaAtual = indice;
 
                     mostrarListas();
                 };
 
 
-            /* COMEÇOU A ARRASTAR */
+            /* =================================
+               PRESSIONAR E SEGURAR
+            ================================= */
+
+            botao.addEventListener(
+                "pointerdown",
+                function() {
+
+                    timerPressionarLista =
+                        setTimeout(
+                            function() {
+
+                                abrirMenuLista(
+                                    indice
+                                );
+
+                            },
+                            600
+                        );
+                }
+            );
+
+
+            botao.addEventListener(
+                "pointerup",
+                function() {
+
+                    clearTimeout(
+                        timerPressionarLista
+                    );
+                }
+            );
+
+
+            botao.addEventListener(
+                "pointerleave",
+                function() {
+
+                    clearTimeout(
+                        timerPressionarLista
+                    );
+                }
+            );
+
+
+            botao.addEventListener(
+                "pointercancel",
+                function() {
+
+                    clearTimeout(
+                        timerPressionarLista
+                    );
+                }
+            );
+
+
+            /* =================================
+               ARRASTAR LISTA
+            ================================= */
 
             botao.addEventListener(
                 "dragstart",
@@ -282,8 +338,6 @@ function mostrarListas() {
             );
 
 
-            /* TERMINOU */
-
             botao.addEventListener(
                 "dragend",
                 function() {
@@ -298,8 +352,6 @@ function mostrarListas() {
             );
 
 
-            /* PASSOU POR CIMA */
-
             botao.addEventListener(
                 "dragover",
                 function(event) {
@@ -308,8 +360,6 @@ function mostrarListas() {
                 }
             );
 
-
-            /* SOLTOU */
 
             botao.addEventListener(
                 "drop",
@@ -321,59 +371,23 @@ function mostrarListas() {
                         listaArrastada === null ||
                         listaArrastada === indice
                     ) {
-
                         return;
                     }
 
                     let listasAtualizadas =
                         obterListas();
 
-
-                    let listaMovida =
+                    let movida =
                         listasAtualizadas.splice(
                             listaArrastada,
                             1
                         )[0];
 
-
                     listasAtualizadas.splice(
                         indice,
                         0,
-                        listaMovida
+                        movida
                     );
-
-
-                    /*
-                       Mantém a lista aberta
-                       correta após reorganizar.
-                    */
-
-                    if (
-                        listaAtual ===
-                        listaArrastada
-                    ) {
-
-                        listaAtual =
-                            indice;
-
-                    } else if (
-                        listaArrastada <
-                            listaAtual &&
-                        indice >=
-                            listaAtual
-                    ) {
-
-                        listaAtual--;
-
-                    } else if (
-                        listaArrastada >
-                            listaAtual &&
-                        indice <=
-                            listaAtual
-                    ) {
-
-                        listaAtual++;
-                    }
 
 
                     salvarListas(
@@ -393,36 +407,22 @@ function mostrarListas() {
 
 
     /* =====================================
-       NENHUMA LISTA
+       SEM LISTAS
     ===================================== */
 
     if (
         listas.length === 0
     ) {
-
         return;
     }
 
 
-    /* =====================================
-       GARANTIR ÍNDICE VÁLIDO
-    ===================================== */
-
     if (
-        listaAtual >=
-        listas.length
+        listaAtual >= listas.length
     ) {
 
         listaAtual =
             listas.length - 1;
-    }
-
-
-    if (
-        listaAtual < 0
-    ) {
-
-        listaAtual = 0;
     }
 
 
@@ -435,9 +435,7 @@ function mostrarListas() {
 
 
     let div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.className =
         "lista";
@@ -447,16 +445,12 @@ function mostrarListas() {
 
         <h2>${escaparHTML(lista.nome)}</h2>
 
-        <ul id="itensLista"></ul>
-
-        <div id="concluidas"></div>
-
         <div class="caixaAdicionar">
 
             <input
                 type="text"
                 id="campoItem"
-                placeholder="Digite um item..."
+                placeholder="Adicionar item..."
                 autocomplete="off"
             >
 
@@ -469,17 +463,15 @@ function mostrarListas() {
 
         </div>
 
+        <ul id="itensLista"></ul>
+
+        <div id="concluidas"></div>
+
     `;
 
 
-    container.appendChild(
-        div
-    );
+    container.appendChild(div);
 
-
-    /* =====================================
-       LISTA DE TAREFAS PENDENTES
-    ===================================== */
 
     let ul =
         document.getElementById(
@@ -487,21 +479,18 @@ function mostrarListas() {
         );
 
 
+    /* =====================================
+       TAREFAS PENDENTES
+    ===================================== */
+
     lista.itens.forEach(
         function(item, indice) {
-
-            /*
-               Tarefas concluídas não aparecem
-               na lista principal.
-            */
 
             if (
                 item.concluido
             ) {
-
                 return;
             }
-
 
             criarItem(
                 item,
@@ -513,10 +502,10 @@ function mostrarListas() {
 
 
     /* =====================================
-       TAREFAS CONCLUÍDAS
+       CONCLUÍDAS
     ===================================== */
 
-    let tarefasConcluidas =
+    let concluidas =
         lista.itens.filter(
             function(item) {
 
@@ -526,7 +515,7 @@ function mostrarListas() {
 
 
     if (
-        tarefasConcluidas.length > 0
+        concluidas.length > 0
     ) {
 
         criarAreaConcluidas(
@@ -536,7 +525,7 @@ function mostrarListas() {
 
 
     /* =====================================
-       CAMPO DE ADICIONAR ITEM
+       ADICIONAR
     ===================================== */
 
     let campo =
@@ -544,14 +533,11 @@ function mostrarListas() {
             "campoItem"
         );
 
-
     let botaoEnviar =
         document.getElementById(
             "botaoEnviar"
         );
 
-
-    /* ENTER */
 
     campo.addEventListener(
         "keydown",
@@ -568,8 +554,6 @@ function mostrarListas() {
         }
     );
 
-
-    /* BOTÃO ➤ */
 
     botaoEnviar.addEventListener(
         "click",
@@ -592,11 +576,12 @@ function criarItem(
 ) {
 
     let li =
-        document.createElement(
-            "li"
-        );
+        document.createElement("li");
 
     li.draggable = true;
+
+    li.className =
+        "itemTarefa";
 
 
     li.innerHTML = `
@@ -615,7 +600,7 @@ function criarItem(
 
     let checkbox =
         li.querySelector(
-            "input[type='checkbox']"
+            "input"
         );
 
 
@@ -626,7 +611,7 @@ function criarItem(
 
 
     /* =====================================
-       MARCAR COMO CONCLUÍDA
+       CONCLUIR
     ===================================== */
 
     checkbox.addEventListener(
@@ -636,7 +621,6 @@ function criarItem(
             let listas =
                 obterListas();
 
-
             listas[
                 listaAtual
             ].itens[
@@ -644,17 +628,9 @@ function criarItem(
             ].concluido =
                 checkbox.checked;
 
-
             salvarListas(
                 listas
             );
-
-
-            /*
-               Ao marcar, a tarefa sai
-               da lista principal e vai
-               para a aba concluídas.
-            */
 
             mostrarListas();
         }
@@ -662,7 +638,7 @@ function criarItem(
 
 
     /* =====================================
-       EDITAR TEXTO
+       EDITAR
     ===================================== */
 
     texto.addEventListener(
@@ -672,15 +648,9 @@ function criarItem(
             let novoTexto =
                 texto.textContent.trim();
 
-
             let listas =
                 obterListas();
 
-
-            /*
-               Se apagar todo o texto,
-               a tarefa é excluída.
-            */
 
             if (
                 novoTexto === ""
@@ -688,23 +658,19 @@ function criarItem(
 
                 listas[
                     listaAtual
-                ]
-                    .itens
-                    .splice(
-                        indice,
-                        1
-                    );
+                ].itens.splice(
+                    indice,
+                    1
+                );
 
             } else {
 
                 listas[
                     listaAtual
-                ]
-                    .itens[
-                        indice
-                    ]
-                    .texto =
-                        novoTexto;
+                ].itens[
+                    indice
+                ].texto =
+                    novoTexto;
             }
 
 
@@ -712,15 +678,10 @@ function criarItem(
                 listas
             );
 
-
             mostrarListas();
         }
     );
 
-
-    /* =====================================
-       ENTER AO EDITAR
-    ===================================== */
 
     texto.addEventListener(
         "keydown",
@@ -785,19 +746,15 @@ function criarItem(
 
             event.preventDefault();
 
-
             if (
                 itemArrastado === null ||
                 itemArrastado === indice
             ) {
-
                 return;
             }
 
-
             let listas =
                 obterListas();
-
 
             let itens =
                 listas[
@@ -805,7 +762,7 @@ function criarItem(
                 ].itens;
 
 
-            let itemMovido =
+            let movido =
                 itens.splice(
                     itemArrastado,
                     1
@@ -815,7 +772,7 @@ function criarItem(
             itens.splice(
                 indice,
                 0,
-                itemMovido
+                movido
             );
 
 
@@ -823,20 +780,17 @@ function criarItem(
                 listas
             );
 
-
             mostrarListas();
         }
     );
 
 
-    ul.appendChild(
-        li
-    );
+    ul.appendChild(li);
 }
 
 
 /* =========================================
-   ÁREA DE TAREFAS CONCLUÍDAS
+   TAREFAS CONCLUÍDAS
 ========================================= */
 
 function criarAreaConcluidas(
@@ -854,14 +808,7 @@ function criarAreaConcluidas(
             "details"
         );
 
-
-    /*
-       IMPORTANTE:
-       A aba começa fechada.
-    */
-
     detalhes.open = false;
-
 
     detalhes.className =
         "tarefasConcluidas";
@@ -899,7 +846,6 @@ function criarAreaConcluidas(
             if (
                 !item.concluido
             ) {
-
                 return;
             }
 
@@ -936,18 +882,9 @@ function criarAreaConcluidas(
                 );
 
 
-            /*
-               Visual da tarefa concluída.
-            */
-
             texto.style.textDecoration =
                 "line-through";
 
-
-            /*
-               Desmarcar:
-               volta para a lista principal.
-            */
 
             checkbox.addEventListener(
                 "change",
@@ -956,7 +893,6 @@ function criarAreaConcluidas(
                     let listas =
                         obterListas();
 
-
                     listas[
                         listaAtual
                     ].itens[
@@ -964,20 +900,16 @@ function criarAreaConcluidas(
                     ].concluido =
                         false;
 
-
                     salvarListas(
                         listas
                     );
-
 
                     mostrarListas();
                 }
             );
 
 
-            ul.appendChild(
-                li
-            );
+            ul.appendChild(li);
         }
     );
 
@@ -1004,21 +936,12 @@ function adicionarItem() {
         !campo ||
         campo.value.trim() === ""
     ) {
-
         return;
     }
 
 
     let listas =
         obterListas();
-
-
-    if (
-        !listas[listaAtual]
-    ) {
-
-        return;
-    }
 
 
     listas[
@@ -1030,7 +953,6 @@ function adicionarItem() {
 
         concluido:
             false
-
     });
 
 
@@ -1062,14 +984,13 @@ function escaparHTML(texto) {
 
 
 /* =========================================
-   CARREGAR APLICATIVO
+   INICIAR
 ========================================= */
 
 function carregarListas() {
 
     let listas =
         obterListas();
-
 
     if (
         listas.length === 0
@@ -1078,8 +999,7 @@ function carregarListas() {
         listaAtual = 0;
 
     } else if (
-        listaAtual >=
-        listas.length
+        listaAtual >= listas.length
     ) {
 
         listaAtual =
@@ -1107,26 +1027,7 @@ if (
         function() {
 
             navigator.serviceWorker
-                .register("./sw.js")
-
-                .then(
-                    function() {
-
-                        console.log(
-                            "Aplicativo pronto."
-                        );
-                    }
-                )
-
-                .catch(
-                    function(erro) {
-
-                        console.log(
-                            "Erro no Service Worker:",
-                            erro
-                        );
-                    }
-                );
+                .register("./sw.js");
         }
     );
 }
