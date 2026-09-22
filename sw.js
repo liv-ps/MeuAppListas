@@ -1,21 +1,18 @@
-const CACHE_NAME = "minhas-listas-v1";
+const CACHE_NAME = "minhas-listas-v2";
 
 const ARQUIVOS = [
-
     "./",
-
     "./index.html",
-
     "./style.css",
-
     "./script.js",
-
     "./manifest.json",
-
     "./icon.svg"
-
 ];
 
+
+/* =========================================
+   INSTALAÇÃO
+========================================= */
 
 self.addEventListener(
     "install",
@@ -35,10 +32,77 @@ self.addEventListener(
                     );
                 }
             )
+
         );
+
+        /*
+           Permite que a nova versão
+           seja ativada imediatamente.
+        */
+
+        self.skipWaiting();
     }
 );
 
+
+/* =========================================
+   ATIVAÇÃO
+========================================= */
+
+self.addEventListener(
+    "activate",
+    function(event) {
+
+        event.waitUntil(
+
+            caches.keys()
+
+            .then(
+                function(nomesCaches) {
+
+                    return Promise.all(
+
+                        nomesCaches.map(
+                            function(nomeCache) {
+
+                                /*
+                                   Apaga versões antigas
+                                   do cache.
+                                */
+
+                                if (
+                                    nomeCache !==
+                                    CACHE_NAME
+                                ) {
+
+                                    return caches.delete(
+                                        nomeCache
+                                    );
+                                }
+
+                            }
+                        )
+
+                    );
+
+                }
+            )
+
+        );
+
+        /*
+           Faz a nova versão assumir
+           as páginas abertas.
+        */
+
+        self.clients.claim();
+    }
+);
+
+
+/* =========================================
+   BUSCAR ARQUIVOS
+========================================= */
 
 self.addEventListener(
     "fetch",
@@ -53,10 +117,32 @@ self.addEventListener(
             .then(
                 function(resposta) {
 
-                    return resposta ||
-                        fetch(
-                            event.request
-                        );
+                    /*
+                       Se estiver no cache,
+                       usa o arquivo salvo.
+                    */
+
+                    if (resposta) {
+
+                        return resposta;
+                    }
+
+
+                    /*
+                       Caso contrário,
+                       busca na internet.
+                    */
+
+                    return fetch(
+                        event.request
+                    );
+
+                }
+            )
+
+        );
+    }
+);
                 }
             )
         );
