@@ -151,10 +151,6 @@ h1 {
 
     -webkit-user-select: none;
 
-    /*
-       Permite que o JavaScript
-       controle o gesto de arrastar.
-    */
     touch-action: none;
 
     -webkit-tap-highlight-color: transparent;
@@ -175,12 +171,6 @@ h1 {
 .botaoLista:active {
     transform: scale(0.97);
 }
-
-
-/*
-   Aparência enquanto a lista
-   está sendo reorganizada.
-*/
 
 .botaoLista.lista-arrastando {
     opacity: 0.45;
@@ -223,23 +213,68 @@ h1 {
 
 
 /* =========================================
-   NOME DA LISTA
+   CABEÇALHO DA LISTA E BOTÃO 3 PONTOS
 ========================================= */
 
-.lista h2 {
-    text-align: center;
+.cabecalhoLista {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.cabecalhoLista h2 {
+    text-align: left;
 
     color: #800020;
 
-    margin-top: 0;
-
-    margin-bottom: 18px;
+    margin: 0;
 
     font-size: 23px;
 
     font-weight: 500;
 
     overflow-wrap: anywhere;
+}
+
+.botaoTresPontos {
+    background: transparent;
+
+    border: none;
+
+    color: #800020;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    padding: 4px 8px;
+
+    border-radius: 50%;
+
+    line-height: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition: background-color 0.15s;
+}
+
+.botaoTresPontos:active,
+.botaoTresPontos:hover {
+    background-color: #f0f0f0;
 }
 
 
@@ -382,26 +417,14 @@ h1 {
 
     background-color: transparent;
 
-    /*
-       Fundamental para o arrastar
-       funcionar com o dedo.
-    */
-    touch-action: none;
-
     user-select: none;
 
     -webkit-user-select: none;
-
-    cursor: grab;
 
     transition:
         background-color 0.15s,
         opacity 0.15s,
         transform 0.15s;
-}
-
-.lista li.itemTarefa:active {
-    cursor: grabbing;
 }
 
 .lista li.itemTarefa:hover {
@@ -426,9 +449,6 @@ h1 {
 
     cursor: pointer;
 
-    /*
-       O checkbox continua clicável.
-    */
     touch-action: manipulation;
 }
 
@@ -459,30 +479,12 @@ h1 {
     font-size: 16px;
 }
 
-
-/*
-   Quando estiver editando
-*/
-
 .textoItem:focus {
     background-color: #f5f5f5;
 
     border-radius: 4px;
 
     padding: 3px 5px;
-}
-
-
-/* =========================================
-   ITEM SENDO ARRASTADO
-========================================= */
-
-.item-arrastando {
-    opacity: 0.4;
-
-    background-color: #eeeeee !important;
-
-    transform: scale(0.98);
 }
 
 
@@ -497,11 +499,6 @@ h1 {
 
     border-top: 1px solid #dddddd;
 }
-
-
-/* =========================================
-   CABEÇALHO DAS CONCLUÍDAS
-========================================= */
 
 .tarefasConcluidas summary {
     color: #800020;
@@ -521,19 +518,9 @@ h1 {
     -webkit-user-select: none;
 }
 
-
-/*
-   Remove seta padrão
-*/
-
 .tarefasConcluidas summary::-webkit-details-marker {
     display: none;
 }
-
-
-/*
-   Nossa seta
-*/
 
 .tarefasConcluidas summary::before {
     content: "›";
@@ -546,30 +533,19 @@ h1 {
 
     line-height: 10px;
 
-    transition:
-        transform 0.2s;
+    transition: transform 0.2s;
 }
 
-
-/*
-   Quando abrir
-*/
-
-.tarefasConcluidas[open]
-summary::before {
-
+.tarefasConcluidas[open] summary::before {
     transform: rotate(90deg);
 }
-
-
-/* =========================================
-   ITENS CONCLUÍDOS
-========================================= */
 
 .tarefasConcluidas li {
     display: flex;
 
     align-items: center;
+
+    justify-content: space-between;
 
     gap: 8px;
 
@@ -616,21 +592,17 @@ summary::before {
         overflow-x: hidden;
     }
 
-
     body {
         padding: 15px;
     }
-
 
     h1 {
         font-size: 22px;
     }
 
-
     #menuListas {
         margin-bottom: 15px;
     }
-
 
     .botaoNovaLista {
         width: 38px;
@@ -640,13 +612,11 @@ summary::before {
         font-size: 24px;
     }
 
-
     .botaoLista {
         padding: 8px 15px;
 
         font-size: 14px;
     }
-
 
     .lista {
         min-height: 450px;
@@ -656,25 +626,19 @@ summary::before {
         border-radius: 18px;
     }
 
-
-    .lista h2 {
+    .cabecalhoLista h2 {
         font-size: 21px;
-
-        margin-bottom: 16px;
     }
-
 
     .caixaAdicionar {
         margin-bottom: 18px;
     }
-
 
     .caixaAdicionar input {
         height: 45px;
 
         font-size: 16px;
     }
-
 
     .caixaAdicionar button {
         width: 45px;
@@ -684,18 +648,15 @@ summary::before {
         min-width: 45px;
     }
 
-
     .lista li.itemTarefa {
         padding: 11px 8px;
 
         margin-bottom: 6px;
     }
 
-
     .textoItem {
         font-size: 16px;
     }
-
 
     .tarefasConcluidas summary {
         font-size: 14px;
@@ -710,18 +671,10 @@ summary::before {
 @supports (-webkit-touch-callout: none) {
 
     .caixaAdicionar input {
-        /*
-           Evita que o Safari aumente
-           o zoom ao tocar no campo.
-        */
         font-size: 16px;
     }
 
     body {
-        /*
-           Evita pequenas mudanças
-           horizontais causadas pelo Safari.
-        */
         overflow-x: hidden;
     }
 }
